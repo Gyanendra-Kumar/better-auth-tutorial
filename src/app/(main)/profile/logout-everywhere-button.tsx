@@ -3,6 +3,8 @@
 import { LoadingButton } from "@/components/loading-button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { authClient } from "../../../lib/auth-client";
 
 export function LogoutEverywhereButton() {
   const [loading, setLoading] = useState(false);
@@ -11,6 +13,16 @@ export function LogoutEverywhereButton() {
 
   async function handleLogoutEverywhere() {
     // TODO: Handle logout everywhere
+    setLoading(true);
+    const { error } = await authClient.revokeSessions();
+
+    setLoading(false);
+    if (error) {
+      toast.error(error.message || "Failed to log out everywhere");
+    } else {
+      toast.success("Logged out from all devices");
+      router.push("/sign-in");
+    }
   }
 
   return (

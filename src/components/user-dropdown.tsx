@@ -4,6 +4,9 @@ import { LogOutIcon, ShieldIcon, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { User } from "../lib/auth";
+import { authClient } from "../lib/auth-client";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -14,20 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export function UserDropdown() {
-  // TODO: Render real user info
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    image: undefined,
-    role: "admin",
-  };
+type UserProps = Readonly<{ user: User }>;
 
+export function UserDropdown({ user }: UserProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          {user.image ? (
+          {user?.image ? (
             <Image
               src={user.image}
               alt={user.name}
@@ -38,7 +35,7 @@ export function UserDropdown() {
           ) : (
             <UserIcon />
           )}
-          <span className="max-w-[12rem] truncate">{user.name}</span>
+          <span className="max-w-[12rem] truncate">{user?.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -49,8 +46,8 @@ export function UserDropdown() {
             <UserIcon className="size-4" /> <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        {/* TODO: Hide admin item for non-admin users */}
-        <AdminItem />
+
+        {user.role === "admin" && <AdminItem />}
         <SignOutItem />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -72,6 +69,13 @@ function SignOutItem() {
 
   async function handleSignOut() {
     // TODO: Handle sign out
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message ?? "Something went wrong");
+    } else {
+      toast.success("Signed out successfully.");
+      router.push("/sign-in");
+    }
   }
 
   return (

@@ -3,8 +3,12 @@ import codingInFlowLogo from "@/assets/coding_in_flow_logo.jpg";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { getServerSession } from "../lib/get-session";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession();
+  const user = session?.user;
+
   return (
     <main className="flex min-h-svh items-center justify-center px-4">
       <div className="mx-auto max-w-3xl text-center">
@@ -41,12 +45,15 @@ export default function Home() {
           </Link>
         </p>
         <div className="mx-auto mt-6 flex max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button asChild>
-            <Link href="/dashboard">Go to Dashboard</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
+          {user ? (
+            <Button asChild>
+              <Link href="/dashboard">Go to Dashboard</Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline">
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
+          )}
         </div>
       </div>
     </main>

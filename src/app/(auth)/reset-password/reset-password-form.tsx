@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { authClient } from "../../../lib/auth-client";
 
 const resetPasswordSchema = z.object({
   newPassword: passwordSchema,
@@ -40,7 +41,21 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   });
 
   async function onSubmit({ newPassword }: ResetPasswordValues) {
-    // TODO: Handle password reset request
+    setError(null);
+    setSuccess(null);
+
+    const { error } = await authClient.resetPassword({
+      newPassword,
+      token,
+    });
+
+    if (error) {
+      setError(error.message ?? "Something went wrong!");
+    } else {
+      setSuccess("Password has been reset. You can now sign in.");
+      router.push("/sign-in");
+      form.reset();
+    }
   }
 
   const loading = form.formState.isSubmitting;

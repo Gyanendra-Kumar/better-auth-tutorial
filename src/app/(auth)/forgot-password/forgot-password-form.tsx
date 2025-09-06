@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { authClient } from "../../../lib/auth-client";
 
 const forgotPasswordSchema = z.object({
   email: z.email({ message: "Please enter a valid email" }),
@@ -32,7 +33,22 @@ export function ForgotPasswordForm() {
   });
 
   async function onSubmit({ email }: ForgotPasswordValues) {
-    // TODO: Handle password reset
+    setSuccess(null);
+    setError(null);
+
+    const { error } = await authClient.requestPasswordReset({
+      email,
+      redirectTo: "/reset-password",
+    });
+
+    if (error) {
+      setError(error.message ?? "Something went wrong!");
+    } else {
+      setSuccess(
+        "If an account exists for this email, we've sent a password reset link.",
+      );
+      form.reset()
+    }
   }
 
   const loading = form.formState.isSubmitting;

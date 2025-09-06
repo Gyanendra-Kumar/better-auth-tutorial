@@ -28,7 +28,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
+import { authClient } from "../../../lib/auth-client";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email" }),
@@ -44,6 +46,7 @@ export function SignInForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -55,11 +58,37 @@ export function SignInForm() {
   });
 
   async function onSubmit({ email, password, rememberMe }: SignInValues) {
-    // TODO: Handle sign in
+    setError(null);
+    setLoading(true);
+
+    const { error } = await authClient.signIn.email({
+      email,
+      password,
+      rememberMe,
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message ?? "Something went wrong!");
+    } else {
+      toast.success("Signed in successfully");
+      router.push(redirect ?? "/dashboard");
+    }
   }
 
   async function handleSocialSignIn(provider: "google" | "github") {
     // TODO: Handle social sign in
+    setError(null);
+    setLoading(true);
+
+    const { error } = await authClient.signIn.social({
+      provider,
+      callbackURL: redirect ?? "/dashboard",
+    });
+    setLoading(false);
+
+    if (error) {
+      setError(error.message ?? "Something went wrong!");
+    }
   }
 
   return (

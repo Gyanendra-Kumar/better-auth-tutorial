@@ -19,6 +19,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { User } from "../../../lib/auth";
+import { authClient } from "../../../lib/auth-client";
 
 const updateProfileSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
@@ -27,17 +29,17 @@ const updateProfileSchema = z.object({
 
 export type UpdateProfileValues = z.infer<typeof updateProfileSchema>;
 
-export function ProfileDetailsForm() {
+export function ProfileDetailsForm({ user }: { user: User }) {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
   // TODO: Render real user info
-  const user = {
-    name: "John Doe",
-    image: undefined,
-  };
+  // const user = {
+  //   name: "John Doe",
+  //   image: undefined,
+  // };
 
   const form = useForm<UpdateProfileValues>({
     resolver: zodResolver(updateProfileSchema),
@@ -48,7 +50,17 @@ export function ProfileDetailsForm() {
   });
 
   async function onSubmit({ name, image }: UpdateProfileValues) {
-    // TODO: Handle profile update
+    setStatus(null);
+    setError(null);
+
+    const { error } = await authClient.updateUser({ name, image });
+
+    if (error) {
+      setError(error.message || "Something went wrong");
+    } else {
+      setStatus("Profile updated successfully");
+      router.refresh();
+    }
   }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
