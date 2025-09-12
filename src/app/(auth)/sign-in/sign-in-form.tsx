@@ -94,9 +94,7 @@ export function SignInForm() {
       }
       // const encryptedData = encryptPayload(process.env.SHARED_ENC_KEY!, data);
 
-      router.push(
-        `${finalRedirect}?token=${data.token}?user=${JSON.stringify(data.user)}`,
-      );
+      router.push(`${finalRedirect}?token=${JSON.stringify(data)}`);
     }
   }
 
