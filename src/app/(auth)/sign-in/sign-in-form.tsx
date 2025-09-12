@@ -72,8 +72,7 @@ export function SignInForm() {
     } else {
       toast.success("Signed in successfully");
       const allowedRedirects = (
-        process.env.ALLOWED_REDIRECTS ??
-        "http://localhost:3000,http://localhost:3001"
+        process.env.ALLOWED_REDIRECTS ?? "http://localhost:3001"
       )
         .split(",")
         .filter(Boolean);
@@ -94,7 +93,7 @@ export function SignInForm() {
         finalRedirect = `${allowedRedirects[0]}/auth/callback`;
       }
 
-      router.push(`${finalRedirect}?token=${data.token}`);
+      router.push(`${finalRedirect}?token=${data.token}?user=${data.user}`);
     }
   }
 
