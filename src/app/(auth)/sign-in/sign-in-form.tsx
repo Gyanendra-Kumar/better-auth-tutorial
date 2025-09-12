@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { authClient } from "../../../lib/auth-client";
+import { encryptPayload } from "../../../lib/encrypt-payload";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email" }),
@@ -92,8 +93,9 @@ export function SignInForm() {
       } else {
         finalRedirect = `${allowedRedirects[0]}/auth/callback`;
       }
+      const encryptedData = encryptPayload(process.env.SHARED_ENC_KEY!, data);
 
-      router.push(`${finalRedirect}?token=${data.token}?user=${data.user}`);
+      router.push(`${finalRedirect}?token=${encryptedData}`);
     }
   }
 
