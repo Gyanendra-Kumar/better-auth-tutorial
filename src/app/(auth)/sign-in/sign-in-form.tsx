@@ -93,13 +93,19 @@ export function SignInForm() {
         finalRedirect = `${allowedRedirects[0]}/auth/callback`;
       }
 
-      const token = await fetch("/api/generate-token", {
+      const res = await fetch("/api/generate-token", {
         method: "POST",
-        body: JSON.stringify({ userId: data.user.id }),
         headers: { "Content-Type": "application/json" },
-      }).then((res) => res.json());
+        body: JSON.stringify({ userId: data.user.id }),
+      });
 
-      router.push(`${finalRedirect}?token=${token.jwt}`);
+      const tokenData = await res.json();
+
+      if (!res.ok) {
+        throw new Error(tokenData.error || "Failed to generate token");
+      }
+
+      router.push(`${finalRedirect}?token=${tokenData.jwt}`);
     }
   }
 

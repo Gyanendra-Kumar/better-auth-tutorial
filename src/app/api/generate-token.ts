@@ -2,13 +2,22 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 export async function POST(req: Request) {
-  const { userId } = await req.json();
+  try {
+    const { userId } = await req.json();
 
-  const token = jwt.sign(
-    { userId },
-    process.env.JWT_SECRET!, // keep secret in env
-    { expiresIn: "1h" },
-  );
+    if (!userId) {
+      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    }
 
-  return NextResponse.json({ jwt: token });
+    const token = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+      expiresIn: "1h",
+    });
+
+    return NextResponse.json({ jwt: token });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Failed to generate token" },
+      { status: 500 },
+    );
+  }
 }
