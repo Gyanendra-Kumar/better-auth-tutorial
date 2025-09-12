@@ -61,7 +61,7 @@ export function SignInForm() {
     setError(null);
     setLoading(true);
 
-    const { error } = await authClient.signIn.email({
+    const { error, data } = await authClient.signIn.email({
       email,
       password,
       rememberMe,
@@ -71,7 +71,26 @@ export function SignInForm() {
       setError(error.message ?? "Something went wrong!");
     } else {
       toast.success("Signed in successfully");
-      router.push(redirect ?? "/dashboard");
+      const allowedRedirects = process.env.ALLOWED_REDIRECTS!.split(",");
+      let finalRedirect: string;
+      // console.log("data: ", { data });
+      // router.push(redirect ?? "/dashboard");
+      if (
+        redirect &&
+        allowedRedirects.some((url) => redirect.startsWith(url))
+      ) {
+        finalRedirect = redirect;
+      } else {
+        finalRedirect = `${allowedRedirects[0]}/auth/callback`;
+      }
+
+      const token = await fetch("/api/generate-token", {
+        method: "POST",
+        body: JSON.stringify({ userId: data.user.id }),
+        headers: { "Content-Type": "application/json" },
+      }).then((res) => res.json());
+
+      router.push(`${finalRedirect}?token=${token.jwt}`);
     }
   }
 
