@@ -72,7 +72,8 @@ export function SignInForm() {
     } else {
       toast.success("Signed in successfully");
       const allowedRedirects = (
-        process.env.ALLOWED_REDIRECTS ?? "http://localhost:3000"
+        process.env.ALLOWED_REDIRECTS ??
+        "http://localhost:3000,http://localhost:3001"
       )
         .split(",")
         .filter(Boolean);
@@ -82,7 +83,7 @@ export function SignInForm() {
       }
 
       let finalRedirect: string;
-      // console.log("data: ", { data });
+      console.log("data: ", data);
       // router.push(redirect ?? "/dashboard");
       if (
         redirect &&
@@ -93,19 +94,7 @@ export function SignInForm() {
         finalRedirect = `${allowedRedirects[0]}/auth/callback`;
       }
 
-      const res = await fetch("/api/generate-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: data.user.id }),
-      });
-
-      const tokenData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(tokenData.error || "Failed to generate token");
-      }
-
-      router.push(`${finalRedirect}?token=${tokenData.jwt}`);
+      router.push(`${finalRedirect}?token=${data.token}`);
     }
   }
 
