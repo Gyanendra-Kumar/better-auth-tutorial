@@ -93,8 +93,8 @@ export function SignInForm() {
         finalRedirect = `${allowedRedirects[0]}/auth/callback`;
       }
       // const encryptedData = encryptPayload(process.env.SHARED_ENC_KEY!, data);
-
-      router.push(`${finalRedirect}?token=${JSON.stringify(data)}`);
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      router.push(`${finalRedirect}?token=${JSON.stringify(encoded)}`);
     }
   }
 
