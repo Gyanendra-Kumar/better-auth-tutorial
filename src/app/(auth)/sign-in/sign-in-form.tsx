@@ -1,10 +1,7 @@
 "use client";
 
-import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { LoadingButton } from "@/components/loading-button";
 import { PasswordInput } from "@/components/password-input";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -47,7 +44,6 @@ export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
-  console.log("🚀 ~ sign-in-form.tsx:50 ~ SignInForm ~ redirect:", redirect);
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -77,21 +73,21 @@ export function SignInForm() {
     }
   }
 
-  async function handleSocialSignIn(provider: "google" | "github") {
-    // TODO: Handle social sign in
-    setError(null);
-    setLoading(true);
+  // async function handleSocialSignIn(provider: "google" | "github") {
+  //   // TODO: Handle social sign in
+  //   setError(null);
+  //   setLoading(true);
 
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL: redirect ?? "/dashboard",
-    });
-    setLoading(false);
+  //   const { error } = await authClient.signIn.social({
+  //     provider,
+  //     callbackURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth/callback`,
+  //   });
+  //   setLoading(false);
 
-    if (error) {
-      setError(error.message ?? "Something went wrong!");
-    }
-  }
+  //   if (error) {
+  //     setError(error.message ?? "Something went wrong!");
+  //   }
+  // }
 
   return (
     <Card className="w-full max-w-md">
@@ -174,7 +170,7 @@ export function SignInForm() {
               Login
             </LoadingButton>
 
-            <div className="flex w-full flex-col items-center justify-between gap-2">
+            {/* <div className="flex w-full flex-col items-center justify-between gap-2">
               <Button
                 type="button"
                 variant="outline"
@@ -196,7 +192,7 @@ export function SignInForm() {
                 <GitHubIcon />
                 Sign in with Github
               </Button>
-            </div>
+            </div> */}
           </form>
         </Form>
       </CardContent>
