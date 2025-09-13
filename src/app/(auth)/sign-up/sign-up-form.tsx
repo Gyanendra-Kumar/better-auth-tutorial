@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { passwordSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -49,6 +49,8 @@ export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -76,7 +78,9 @@ export function SignUpForm() {
     } else {
       toast.success("Signed up successfully");
 
-      router.push("/dashboard");
+      // router.push("/dashboard");
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      router.push(`${redirect}?token=${encoded}`);
     }
   }
 
