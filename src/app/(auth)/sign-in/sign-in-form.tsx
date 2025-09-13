@@ -72,7 +72,7 @@ export function SignInForm() {
       setError(error.message ?? "Something went wrong!");
     } else {
       toast.success("Signed in successfully");
-      const encoded = encodeURIComponent(JSON.stringify(data.user));
+      const encoded = encodeURIComponent(JSON.stringify(data));
       router.push(`${redirect}?token=${encoded}`);
     }
   }
