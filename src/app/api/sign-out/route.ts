@@ -1,18 +1,27 @@
 import { NextResponse } from "next/server";
-import { toast } from "sonner";
 import { authClient } from "../../../lib/auth-client";
 
-export async function POST() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const redirectUrl = searchParams.get("redirect") || "/";
+  const decodedRedirectUrl = decodeURIComponent(redirectUrl);
   try {
+    // const cookieStore = await cookies();
     await authClient.signOut();
-    toast.success("Signed out successfully");
-    return NextResponse.json({ success: true });
+    const res = NextResponse.redirect(decodedRedirectUrl);
+
+    res.cookies.delete("better-auth.session_token");
+
+    return res;
   } catch (error) {
     console.error("Sign out error:", error);
-    toast.error("Something went wrong");
+
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
+      {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
     );
   }
 }
