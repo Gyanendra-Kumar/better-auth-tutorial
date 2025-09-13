@@ -47,6 +47,7 @@ export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
+  console.log("🚀 ~ sign-in-form.tsx:50 ~ SignInForm ~ redirect:", redirect);
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -71,30 +72,8 @@ export function SignInForm() {
       setError(error.message ?? "Something went wrong!");
     } else {
       toast.success("Signed in successfully");
-      const allowedRedirects = (
-        process.env.ALLOWED_REDIRECTS ?? "http://localhost:3001"
-      )
-        .split(",")
-        .filter(Boolean);
-
-      if (!allowedRedirects.length) {
-        throw new Error("No ALLOWED_REDIRECTS configured");
-      }
-
-      let finalRedirect: string;
-      console.log("data: ", data);
-      // router.push(redirect ?? "/dashboard");
-      if (
-        redirect &&
-        allowedRedirects.some((url) => redirect.startsWith(url))
-      ) {
-        finalRedirect = redirect;
-      } else {
-        finalRedirect = `${allowedRedirects[0]}/auth/callback`;
-      }
-      // const encryptedData = encryptPayload(process.env.SHARED_ENC_KEY!, data);
-      const encoded = encodeURIComponent(JSON.stringify(data));
-      router.push(`${finalRedirect}?token=${JSON.stringify(encoded)}`);
+      const encoded = encodeURIComponent(JSON.stringify(data.user));
+      router.push(`${redirect}?token=${encoded}`);
     }
   }
 
